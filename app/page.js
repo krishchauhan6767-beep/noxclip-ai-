@@ -17,7 +17,21 @@ export default function Home() {
       padding: "25px 16px"
     }}>
       <header style={{maxWidth: 850, margin: "auto"}}>
+
         <h1 style={{color: "#a78bfa"}}>NOXCLIP AI</h1>
+
+        <a href="/auth" style={{
+          display: "inline-block",
+          color: "white",
+          background: "#8b5cf6",
+          padding: "12px 20px",
+          borderRadius: 8,
+          textDecoration: "none",
+          marginTop: 10
+        }}>
+          Login / Sign Up
+        </a>
+
         <p>Turn long videos into short-form content.</p>
 
         <section style={card}>
@@ -35,6 +49,7 @@ export default function Home() {
           <hr style={line}/>
 
           <p>Or paste a YouTube video link</p>
+
           <input
             style={field}
             placeholder="https://youtube.com/watch?v=..."
@@ -60,6 +75,7 @@ export default function Home() {
           <h1>₹899 / month</h1>
           <p>20 clips every billing cycle</p>
           <p>AI-powered short video workflow</p>
+
           <button style={button}
             onClick={() => setMessage("Subscription setup is coming next.")}>
             Get Pro
@@ -69,6 +85,7 @@ export default function Home() {
         <p style={{textAlign:"center", color:"#777"}}>
           © 2026 NoxClip AI
         </p>
+
       </header>
     </main>
   );
@@ -108,4 +125,3 @@ const line = {
   borderColor:"#373052",
   margin:"25px 0"
 };
-              
