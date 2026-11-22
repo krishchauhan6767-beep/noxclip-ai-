@@ -2,11 +2,83 @@
 "use client";
 
 import { useState } from "react";
+import { supabase } from "../lib/supabase";
 
 export default function Home() {
   const [video, setVideo] = useState(null);
   const [url, setUrl] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function uploadVideo() {
+    if (!supabase) {
+      setMessage("Supabase configuration missing.");
+      return;
+    }
+
+    if (!video) {
+      setMessage(
+        url.trim()
+          ? "YouTube link importing is not connected yet."
+          : "Please select a video first."
+      );
+      return;
+    }
+
+    if (!video.type.startsWith("video/")) {
+      setMessage("Please select a valid video file.");
+      return;
+    }
+
+    setLoading(true);
+    setMessage("Checking login...");
+
+    try {
+      const { data: { user }, error: userError } =
+        await supabase.auth.getUser();
+
+      if (userError) throw userError;
+
+      if (!user) {
+        setMessage("Please login before uploading a video.");
+        return;
+      }
+
+      const safeName = video.name.replace(
+        /[^a-zA-Z0-9._-]/g,
+        "_"
+      );
+
+      const filePath =
+        `${user.id}/${Date.now()}-${safeName}`;
+
+      setMessage("Uploading your video...");
+
+      const { error: uploadError } =
+        await supabase.storage
+          .from("noxclip-videos")
+          .upload(filePath, video, {
+            contentType: video.type,
+            upsert: false
+          });
+
+      if (uploadError) throw uploadError;
+
+      setMessage(
+        "Video uploaded successfully! AI clipping engine is not connected yet."
+      );
+
+      setVideo(null);
+
+      const fileInput = document.getElementById("video-upload");
+      if (fileInput) fileInput.value = "";
+
+    } catch (error) {
+      setMessage(error.message || "Video upload failed.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <main style={{
@@ -39,9 +111,10 @@ export default function Home() {
           <p>Upload a video from your phone</p>
 
           <input
+            id="video-upload"
             type="file"
             accept="video/*"
-            onChange={e => setVideo(e.target.files[0])}
+            onChange={e => setVideo(e.target.files[0] || null)}
           />
 
           {video && <p>Selected: {video.name}</p>}
@@ -57,14 +130,15 @@ export default function Home() {
             onChange={e => setUrl(e.target.value)}
           />
 
-          <button style={button} onClick={() => {
-            setMessage(
-              video || url.trim()
-                ? "Input received. Clipping engine is not connected yet."
-                : "Please upload a video or enter a link."
-            );
-          }}>
-            Generate Clips
+          <button
+            style={{
+              ...button,
+              opacity: loading ? 0.6 : 1
+            }}
+            onClick={uploadVideo}
+            disabled={loading}
+          >
+            {loading ? "Uploading..." : "Upload Video"}
           </button>
 
           <p style={{color:"#c4b5fd"}}>{message}</p>
@@ -76,8 +150,12 @@ export default function Home() {
           <p>20 clips every billing cycle</p>
           <p>AI-powered short video workflow</p>
 
-          <button style={button}
-            onClick={() => setMessage("Subscription setup is coming next.")}>
+          <button
+            style={button}
+            onClick={() => setMessage(
+              "Subscription setup is coming next."
+            )}
+          >
             Get Pro
           </button>
         </section>
@@ -118,7 +196,8 @@ const button = {
   color:"white",
   border:0,
   borderRadius:9,
-  fontWeight:"bold"
+  fontWeight:"bold",
+  cursor:"pointer"
 };
 
 const line = {
