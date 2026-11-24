@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "../lib/supabase";
+import { supabase } from "./lib/supabase";
 
 export default function Home() {
   const [video, setVideo] = useState(null);
@@ -44,9 +44,7 @@ export default function Home() {
         error: userError
       } = await supabase.auth.getUser();
 
-      if (userError) {
-        throw userError;
-      }
+      if (userError) throw userError;
 
       if (!user) {
         setMessage("Please login before uploading a video.");
@@ -63,7 +61,7 @@ export default function Home() {
 
       setMessage("Uploading your video...");
 
-      const { data, error: uploadError } =
+      const { error: uploadError } =
         await supabase.storage
           .from("noxclip-videos")
           .upload(filePath, video, {
@@ -72,11 +70,6 @@ export default function Home() {
           });
 
       if (uploadError) {
-        console.error(
-          "SUPABASE UPLOAD ERROR:",
-          uploadError
-        );
-
         throw new Error(
           `${uploadError.message} | Status: ${
             uploadError.statusCode || "Unknown"
@@ -93,16 +86,11 @@ export default function Home() {
       const fileInput =
         document.getElementById("video-upload");
 
-      if (fileInput) {
-        fileInput.value = "";
-      }
+      if (fileInput) fileInput.value = "";
 
     } catch (error) {
       console.error("UPLOAD FAILED:", error);
-
-      setMessage(
-        error.message || "Video upload failed."
-      );
+      setMessage(error.message || "Video upload failed.");
 
     } finally {
       setLoading(false);
@@ -138,13 +126,10 @@ export default function Home() {
           Login / Sign Up
         </a>
 
-        <p>
-          Turn long videos into short-form content.
-        </p>
+        <p>Turn long videos into short-form content.</p>
 
         <section style={card}>
           <h2>🎬 Create your clips</h2>
-
           <p>Upload a video from your phone</p>
 
           <input
@@ -156,11 +141,7 @@ export default function Home() {
             }
           />
 
-          {video && (
-            <p>
-              Selected: {video.name}
-            </p>
-          )}
+          {video && <p>Selected: {video.name}</p>}
 
           <hr style={line} />
 
@@ -191,11 +172,8 @@ export default function Home() {
 
         <section style={card}>
           <h2>NOXCLIP PRO</h2>
-
           <h1>₹899 / month</h1>
-
           <p>20 clips every billing cycle</p>
-
           <p>AI-powered short video workflow</p>
 
           <button
@@ -257,3 +235,4 @@ const line = {
   borderColor: "#373052",
   margin: "25px 0"
 };
+            
