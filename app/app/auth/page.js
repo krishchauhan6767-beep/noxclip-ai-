@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "../../lib/supabase";
+import { supabase } from "../lib/supabase";
 
 export default function AuthPage() {
   const [mode, setMode] = useState("signup");
@@ -26,9 +26,10 @@ export default function AuthPage() {
     setMessage("");
 
     try {
-      const result = mode === "signup"
-        ? await supabase.auth.signUp({ email, password })
-        : await supabase.auth.signInWithPassword({ email, password });
+      const result =
+        mode === "signup"
+          ? await supabase.auth.signUp({ email, password })
+          : await supabase.auth.signInWithPassword({ email, password });
 
       if (result.error) throw result.error;
 
@@ -82,8 +83,11 @@ export default function AuthPage() {
         />
 
         <button onClick={handleAuth} disabled={loading} style={button}>
-          {loading ? "Please wait..." :
-            mode === "signup" ? "Sign Up" : "Login"}
+          {loading
+            ? "Please wait..."
+            : mode === "signup"
+              ? "Sign Up"
+              : "Login"}
         </button>
 
         <p style={{ color: "#c4b5fd" }}>{message}</p>
@@ -126,3 +130,4 @@ const button = {
   fontWeight: "bold",
   cursor: "pointer"
 };
+            
